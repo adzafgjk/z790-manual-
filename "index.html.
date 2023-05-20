@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My PDF Files</title>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+</head>
+<body>
+
+  <h1>My PDF Files</h1>
+
+  <canvas id="the-canvas"></canvas>
+
+  <script>
+    // If absolute URL from the remote server is provided, configure the CORS
+    // header on that server.
+    var url = 'https://github.com/adzafgjk/z790-manual-/raw/gh-pages/E20739_ROG_STRIX_Z790-A_GAMING_WIFI_D4_UM_WEB.pdf';
+
+    // The workerSrc property shall be specified.
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+    // Asynchronous download of PDF
+    var loadingTask = pdfjsLib.getDocument(url);
+    loadingTask.promise.then(function(pdf) {
+      console.log('PDF loaded');
+
+      // Fetch the first page
+      var pageNumber = 1;
+      pdf.getPage(pageNumber).then(function(page) {
+        console.log('Page loaded');
+        
+        var scale = 1.5;
+        var viewport = page.getViewport({scale: scale});
+
+        // Prepare canvas using PDF page dimensions
+        var canvas = document.getElementById('the-canvas');
+        var context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render PDF page into canvas context
+        var renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        var renderTask = page.render(renderContext);
+        renderTask.promise.then(function () {
+          console.log('Page rendered');
+        });
+      });
+    }, function (reason) {
+      // PDF loading error
+      console.error(reason);
+    });
+  </script>
+
+</body>
+</html>
